@@ -5,6 +5,7 @@
 #include <cmath>
 #include <string.h>
 #include <vector>
+#include <iomanip>
 
 #include "filesystem.hpp"
 
@@ -352,4 +353,44 @@ void Filesystem::copyToLinux(char* name)
         }
     }
     error("Could not copy a file: file not found");
+}
+
+
+void Filesystem::showInfo()
+{
+    load();
+    int filesCounter = 0, dataBlocksCounter = 0, spaceUsed = 0;
+    for(int i = 0; i < super.nOfiNodes; i++)
+    {
+        if(iNodesBitmap[i] != 0)
+        {
+            filesCounter++;
+            spaceUsed += iNodesTable[i].size;
+        }
+    }
+    cout << setprecision(2) << fixed;
+    cout << "There are " << filesCounter << " files in filesystem, occuping " << spaceUsed <<" bytes of memory out of " << super.nOfDataBlocks * super.blockSize << " (" <<100*((float)spaceUsed/(float)(super.blockSize * super.nOfDataBlocks)) <<"%)" << endl;
+    cout << "iNode occupancy bitmap:" <<endl;
+    for(int i = 0; i < super.nOfiNodes; i++)
+        cout << "|" << (iNodesBitmap[i] == 0 ? 'O' : 'X');
+    
+    cout << "|" << endl;
+    
+    //liczymy zajęte bloki pamięci
+    for(int i = 0; i < super.nOfDataBlocks; i++)
+    {
+        if(userDataBitmap[i] != 0) 
+            dataBlocksCounter++;
+    }
+
+    cout << "There are " << dataBlocksCounter << " occupied data blocks out of " << super.nOfDataBlocks << "avaible (" << 100*((float)dataBlocksCounter/(float)super.nOfDataBlocks) << endl;
+    cout << "As we are using linked list allocation, there is no external fragmentation." << endl;
+    cout << spaceUsed <<" bytes of memory are used out of " << dataBlocksCounter * DATA_PER_BLOCK << " allocated (" << 100*((float)spaceUsed/(float)(dataBlocksCounter * DATA_PER_BLOCK)) << "%)" <<endl;
+
+    cout << "Data blocks occupancy bitmap:" <<endl;
+    for(int i = 0; i < super.nOfDataBlocks ;i++)
+        cout << "|" << (userDataBitmap[i] == 0 ? 'O' : 'X');
+
+    cout <<"|" << endl;
+
 }

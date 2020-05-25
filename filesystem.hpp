@@ -13,16 +13,17 @@ class Filesystem
     iNode* iNodesTable;
     Block* userData;
 
-public:
-    void createFilesystem(unsigned int nOfBlocks);
-    bool doesFS_exist();
-    void ls();
-    void rm(char* name);
     void load();
     void save();
+    bool doesFS_exist();
+public:
+    void createFilesystem(unsigned int nOfBlocks);
+    void ls();
+    void rm(char* name);
     void copyFromLinux(char* name, unsigned char rights);
     void copyToLinux(char* name);
     void rmfs();
+    void showInfo();
 };
 inline void error(const char* message);
 
